@@ -8,17 +8,12 @@ export class UserController {
     constructor(private userService: UserService) { }
 
     @Post("/create")
-    createUser(@Body() createUser: CreateUserDTO, @Res() response: Response) {
+    async createUser(@Body() createUser: CreateUserDTO, @Res() response: Response) {
         try {
-            this.userService.createUser(createUser);
-            return response.send({
-                message: "Usuário criado com sucesso!",
-            })
-        }
-        catch (error) {
-            return response.status(400).send({
-                message: error.message,
-            })
+            let user = await this.userService.createUser(createUser);
+            return response.status(201).json({ message: 'Usuário criado com sucesso!', success: true, user });
+        } catch (error) {
+            return response.status(400).json({ message: error.message, error: true });
         }
     }
 

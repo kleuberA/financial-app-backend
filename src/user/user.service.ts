@@ -1,45 +1,34 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import prisma from 'src/lib/prisma';
+import { Prisma, User } from '@prisma/client';
 import { CreateUserDTO } from './DTO/CreateUser';
-import bcrypt from 'bcrypt';
-import { User } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
+    constructor(private readonly prisma: PrismaService) { }
 
+    async createUser(user: CreateUserDTO): Promise<User> {
 
-    async findUnique(email) {
-        const user = await prisma.user.findUnique({
-            where: { email },
-        });
-        return user;
-    }
-
-    async createUser(createUser: CreateUserDTO): Promise<User> {
-
-        try {
-            const userExist = await prisma.user.findUnique({
-                where: { email: createUser.email },
-            })
-
-            if (userExist) {
-                throw new BadRequestException("Usuário não encontrado!");
+        const userExist = await this.prisma.user.findUnique({
+            where: {
+                email: user.email
             }
+        })
 
-            const hashPassword = await bcrypt.hash(createUser.password, 10);
-
-            const user = await prisma.user.create({
-                data: {
-                    ...createUser,
-                    password: hashPassword
-                },
-            });
-
-            delete user.password
-            return user;
-        } catch (error) {
-            throw new BadRequestException(error.message)
+        if (userExist) {
+            throw new BadRequestException("Usuário já esta cadastrado!");
         }
+
+        let userData = await this.prisma.user.create({
+            data: {
+                ...user,
+                password: await bcrypt.hash(user.password, 10)
+            }
+        })
+
+        delete userData.password;
+        return userData;
     }
 
 }
