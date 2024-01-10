@@ -2,11 +2,13 @@ import { Body, Controller, Delete, Param, Post, Res } from '@nestjs/common';
 import { CreateUserDTO } from './DTO/CreateUser';
 import { UserService } from './user.service';
 import { Response } from 'express';
+import { IsPublic } from 'src/auth/decorators/ispublic.decorator';
 
 @Controller('api/v1/user')
 export class UserController {
     constructor(private userService: UserService) { }
 
+    @IsPublic()
     @Post("/create")
     async createUser(@Body() createUser: CreateUserDTO, @Res() response: Response) {
         try {
