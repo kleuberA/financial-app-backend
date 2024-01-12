@@ -11,7 +11,7 @@ import { IsPublic } from 'src/auth/decorators/ispublic.decorator';
 export class CategoryController {
     constructor(private readonly categoryService: CategoryService) { }
 
-    @IsPublic()
+    @UseGuards(LocalAuthGuard)
     @Get("categories")
     async getCategories(@Res() res: Response) {
         try {
