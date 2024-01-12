@@ -1,6 +1,7 @@
 import { IsString, MaxLength, MinLength } from "class-validator";
+import { Category } from "../entities/category.entity";
 
-export class UpdateCategory {
+export class UpdateCategory extends Category {
 
     @IsString()
     @MinLength(3)

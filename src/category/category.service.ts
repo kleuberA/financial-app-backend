@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCategory } from './DTO/create-category.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateCategory } from './DTO/update-category.dto';
+import { DeleteCategory } from './DTO/delete-category.dto';
 
 @Injectable()
 export class CategoryService {
@@ -44,6 +45,24 @@ export class CategoryService {
             },
             data: {
                 name: category.name
+            }
+        })
+    }
+
+    async deleteCategory(category: DeleteCategory) {
+        const categoryExist = await this.prisma.category.findFirst({
+            where: {
+                id: category.id
+            }
+        })
+
+        if (!categoryExist) {
+            throw new BadRequestException("Essa categoria não existe!");
+        }
+
+        await this.prisma.category.delete({
+            where: {
+                id: category.id
             }
         })
     }
