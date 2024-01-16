@@ -6,6 +6,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class DespesasService {
     constructor(private readonly prisma: PrismaService) { }
 
+    async getAllDespesas() {
+        return await this.prisma.despesas.findMany({
+            include: {
+                category: true,
+            }
+        })
+    }
+
     async createDespesas(despesas: CreateDespesas) {
 
         const existCategory = await this.prisma.category.findFirst({
