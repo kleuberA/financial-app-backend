@@ -44,4 +44,23 @@ export class DespesasService {
         })
     }
 
+    async deleteDespesas(id: string) {
+
+        let existDespesa = await this.prisma.despesas.findMany({
+            where: {
+                id
+            }
+        })
+
+        if (!existDespesa) {
+            throw new Error("Despesa não existe!")
+        }
+
+        await this.prisma.despesas.delete({
+            where: {
+                id
+            }
+        })
+    }
+
 }
