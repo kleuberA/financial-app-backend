@@ -7,11 +7,19 @@ export class DespesasService {
     constructor(private readonly prisma: PrismaService) { }
 
     async getAllDespesas() {
-        return await this.prisma.despesas.findMany({
+
+        let allDespesas = await this.prisma.despesas.findMany({
             include: {
                 category: true,
             }
         })
+
+        const totalDespesas = allDespesas.reduce((total, item) => {
+            const valor = parseInt(item.value);
+            return total + (isNaN(valor) ? 0 : valor);
+        }, 0);
+
+        return { allDespesas, totalDespesas }
     }
 
     async createDespesas(despesas: CreateDespesas) {
