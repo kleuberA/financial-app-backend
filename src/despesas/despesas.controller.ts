@@ -1,10 +1,9 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Res, UseGuards } from '@nestjs/common';
-import { Response } from 'express';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res, UseGuards } from '@nestjs/common';
 import { IsPublic } from 'src/auth/decorators/ispublic.decorator';
+import { LocalAuthGuard } from 'src/auth/guard/local-auth-guard';
 import { CreateDespesas } from './dto/create-despesas.dto';
 import { DespesasService } from './despesas.service';
-import { AuthGuard } from '@nestjs/passport';
-import { LocalAuthGuard } from 'src/auth/guard/local-auth-guard';
+import { Response } from 'express';
 
 @Controller('api/v1/despesas')
 export class DespesasController {
@@ -43,4 +42,14 @@ export class DespesasController {
         }
     }
 
+    @UseGuards(LocalAuthGuard)
+    @Patch("update/:id")
+    async updateDespesas(@Param() params, @Body() despesas, @Res() res: Response) {
+        try {
+            await this.despesasService.updateDespesas(params.id as string, despesas);
+            return res.status(HttpStatus.OK).json({ message: "Despesas atualizada com sucesso!" })
+        } catch (error) {
+            return res.status(HttpStatus.BAD_REQUEST).json({ message: "Ocorreu um erro ao atualizar uma despesa!", error: error.message })
+        }
+    }
 }

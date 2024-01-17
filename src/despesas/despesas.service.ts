@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
 import { CreateDespesas } from './dto/create-despesas.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class DespesasService {
@@ -63,4 +63,28 @@ export class DespesasService {
         })
     }
 
+    async updateDespesas(id: string, despesas: CreateDespesas) {
+
+        let existDespesa = await this.prisma.despesas.findMany({
+            where: {
+                id
+            }
+        })
+
+        if (!existDespesa) {
+            throw new Error("Despesa não existe!")
+        }
+
+        await this.prisma.despesas.update({
+            where: {
+                id
+            },
+            data: {
+                name: despesas.name,
+                description: despesas.descricao,
+                value: despesas.valor,
+                categoryId: despesas.categoriaId
+            }
+        })
+    }
 }
